@@ -37,6 +37,11 @@ def _texts(at):
             out.append(element.value.to_string())
         except Exception:
             pass
+    for element in at.table:
+        try:
+            out.append(element.value.to_string())
+        except Exception:
+            out.append(str(element.value))
     return out
 
 
@@ -121,10 +126,22 @@ def test_sidebar_offers_the_fixture_and_local_records():
     at = _run()
     options = [str(o) for o in at.sidebar.selectbox[0].options]
     assert any("SIMULATED" in option for option in options)
+    assert any("mitdb/100" in option for option in options)
+    assert any("mitdb/201" in option for option in options)
+    assert any("mitdb/202" in option for option in options)
+    assert any("bidmc/bidmc01" in option for option in options)
     if os.path.exists("data/raw/mitdb/100.hea"):
         assert any("mitdb/100" in option for option in options)
     if os.path.exists("data/raw/bidmc/bidmc01.hea"):
         assert any("bidmc/bidmc01" in option for option in options)
+
+
+def test_tables_render_without_the_dataframe_element():
+    if not os.path.exists("data/raw/mitdb/100.hea"):
+        pytest.skip("real data missing")
+    at = _run("mitdb/100")
+    assert not at.dataframe
+    assert at.table
 
 
 @pytest.mark.realdata

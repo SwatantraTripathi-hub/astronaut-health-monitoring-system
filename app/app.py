@@ -13,6 +13,11 @@ import pandas as pd
 import numpy as np
 
 from src.pipeline import analyze, make_simulated_fixture
+from src.ingest.datasets import (
+    DatasetUnavailableError,
+    ensure_record,
+    record_choices,
+)
 from src.ingest.wfdb_loader import (
     beat_only,
     get_signal,
@@ -145,16 +150,7 @@ def cached_analysis(path_str, source_label):
 
 
 def record_options():
-    options = ["SIMULATED fixture (sim-001)"]
-    for kind in ("mitdb", "bidmc"):
-        base = ROOT / "data" / "raw" / kind
-        if not base.exists():
-            continue
-        for header in sorted(base.glob("*.hea")):
-            if kind == "bidmc" and header.stem.endswith("n"):
-                continue
-            options.append(f"{kind}/{header.stem}")
-    return options
+    return ["SIMULATED fixture (sim-001)"] + record_choices(ROOT / "data" / "raw")
 
 
 def card_status(indicator, rule_results):
@@ -264,6 +260,9 @@ st.warning(BANNER)
 
 options = record_options()
 choice = st.sidebar.selectbox("Record", options)
+st.sidebar.caption(
+    "Real records are downloaded from PhysioNet the first time you select them."
+)
 
 if choice.startswith("SIMULATED"):
     result = make_simulated_fixture()
@@ -275,6 +274,17 @@ else:
         if kind == "mitdb"
         else "BIDMC PPG and Respiration Dataset, local copy"
     )
+    try:
+        with st.spinner("Preparing record data..."):
+            ensure_record(ROOT / "data" / "raw", choice)
+    except DatasetUnavailableError as exc:
+        st.sidebar.error("Record data unavailable")
+        st.error(str(exc))
+        st.caption(
+            "The SIMULATED fixture is still available. No record, signal, or "
+            "indicator is invented when the real files cannot be loaded."
+        )
+        st.stop()
     with st.spinner("Analysing record..."):
         result = cached_analysis(
             str(ROOT / "data" / "raw" / kind / record), source_label)
@@ -327,18 +337,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 if data_quality["issues"]:
-    st.dataframe(
-        pd.DataFrame(
-            [
-                {
-                    "code": issue["code"],
-                    "severity": issue["severity"],
-                    "message": issue["message"],
-                    "field": issue["field"] or "",
-                }
-                for issue in data_quality["issues"]
-            ]
-        ),
+    st.table(
+        [
+            {
+                "code": issue["code"],
+                "severity": issue["severity"],
+                "message": issue["message"],
+                "field": issue["field"] or "",
+            }
+            for issue in data_quality["issues"]
+        ],
         hide_index=True,
         width="stretch",
     )
@@ -356,17 +364,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 if rhythm["segments"]:
-    st.dataframe(
-        pd.DataFrame(
-            [
-                {
-                    "start (s)": segment["start_s"],
-                    "end (s)": segment["end_s"],
-                    "label": segment["label"],
-                }
-                for segment in rhythm["segments"]
-            ]
-        ),
+    st.table(
+        [
+            {
+                "start (s)": segment["start_s"],
+                "end (s)": segment["end_s"],
+                "label": segment["label"],
+            }
+            for segment in rhythm["segments"]
+        ],
         hide_index=True,
         width="stretch",
     )
@@ -392,18 +398,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 st.subheader("Rule results")
-st.dataframe(
-    pd.DataFrame(
-        [
-            {
-                "rule id": rule["rule_id"],
-                "source": rule["source"],
-                "status": rule["status"],
-                "reason": rule["reason"],
-            }
-            for rule in rule_results
-        ]
-    ),
+st.table(
+    [
+        {
+            "rule id": rule["rule_id"],
+            "source": rule["source"],
+            "status": rule["status"],
+            "reason": rule["reason"],
+        }
+        for rule in rule_results
+    ],
     width="stretch",
     hide_index=True,
 )

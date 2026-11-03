@@ -29,9 +29,10 @@ Raw datasets are not committed. See `data/README.md`.
 
     python -m streamlit run src/app.py
 
-Setup first: activate the venv, `pip install -r requirements.txt`, and put the datasets
-in `data/raw` (see `Data` above). The dashboard offers the SIMULATED fixture and every
-record present in `data/raw/mitdb` and `data/raw/bidmc`.
+Setup first: activate the venv and `pip install -r requirements.txt`. The dashboard offers
+the SIMULATED fixture, every record present in `data/raw/mitdb` and `data/raw/bidmc`, and
+the small PhysioNet record catalog in `src/ingest/datasets.py` (downloaded on first
+selection when it is not already local). Raw datasets are still never committed.
 
 Checks used during development:
 
