@@ -1,30 +1,24 @@
-"""Streamlit dashboard for the astronaut health monitoring research prototype.
+import sys
+import json
+from pathlib import Path
+from html import escape
 
-Run with:  python -m streamlit run src/app.py
-
-The dashboard only displays what src/pipeline.py returns. It never recomputes
-an indicator, never combines indicators into a score, and never calls anything
-healthy.
-"""
+# Add project root to Python path BEFORE importing project modules.
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import streamlit as st
 import pandas as pd
 import numpy as np
+
+from src.pipeline import analyze, make_simulated_fixture
 from src.ingest.wfdb_loader import (
     beat_only,
     get_signal,
     load_beat_annotations,
     load_record,
 )
-from src.pipeline import analyze, make_simulated_fixture
-import json
-from html import escape
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
 
 BANNER = (
