@@ -1,0 +1,42 @@
+# Canonical rule definitions. See CONTEXT.md for the project policy notes.
+rules:
+  - id: hr_sensor_sanity
+    indicator: HR
+    comparison: outside_range
+    value: [15, 300]
+    unit: bpm
+    source: 'none; engineering choice'
+    status: plausibility_check
+    message: 'possible sensor/data error, not a health finding (HR far outside what a heart-rate sensor can report)'
+  - id: spo2_sensor_sanity
+    indicator: SpO2
+    comparison: outside_range
+    value: [0, 100]
+    unit: '%'
+    source: 'none; engineering choice'
+    status: plausibility_check
+    message: 'possible sensor/data error, not a health finding (SpO2 outside its 0 to 100 percent scale)'
+  - id: resp_sensor_sanity
+    indicator: RESP
+    comparison: lt
+    value: 0
+    unit: pm
+    source: 'none; engineering choice'
+    status: plausibility_check
+    message: 'possible sensor/data error, not a health finding (negative respiratory rate)'
+  - id: hr_high_demo
+    indicator: HR
+    comparison: gt
+    value: 133
+    unit: bpm
+    source: 'none; demo only'
+    status: illustrative_not_clinical
+    message: 'ILLUSTRATIVE, NOT CLINICAL: heart rate is above the arbitrary demo value of 133 bpm'
+  - id: spo2_low_demo
+    indicator: SpO2
+    comparison: lt
+    value: 88
+    unit: '%'
+    source: 'none; demo only'
+    status: illustrative_not_clinical
+    message: 'ILLUSTRATIVE, NOT CLINICAL: oxygen saturation is below the arbitrary demo value of 88 percent'

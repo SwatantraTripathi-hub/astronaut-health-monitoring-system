@@ -1,0 +1,20 @@
+# Canonical prototype parameters. Every value is a design choice, not a clinical threshold.
+hrv:
+  window_s: 300 # design parameter, no clinical source
+  min_differences: 100 # design parameter, no clinical source
+  min_coverage: 0.5 # design parameter, no clinical source
+hr:
+  window_s: 10 # design parameter, no clinical source
+  step_s: 10 # design parameter, no clinical source
+rpeaks:
+  bandpass_low_hz: 5 # design parameter, no clinical source
+  bandpass_high_hz: 15 # design parameter, no clinical source
+  integration_ms: 150 # design parameter, no clinical source
+  refractory_ms: 200 # design parameter, no clinical source
+  match_tolerance_ms: 150 # design parameter, no clinical source
+  threshold_fraction: 0.3 # design parameter, no clinical source
+  threshold_window_s: 1.0 # design parameter, no clinical source
+crosscheck:
+  window_s: 10 # design parameter, no clinical source
+numerics:
+  min_valid_fraction: 0.5 # design parameter, no clinical source
